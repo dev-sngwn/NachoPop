@@ -7,10 +7,13 @@ public class PuzzleManager : MonoBehaviour
 
     public GameObject YNacho;
     public GameObject RNacho;
+    public GameObject GNacho;
+    public GameObject KNacho;
     public GameObject Empty;
     public GameObject Field;
     public static Nacho recentNacho;
     public Canvas canvas;
+    public Stack<Nacho> popStack = new Stack<Nacho>();
 
     public GameObject[,] Block = new GameObject[8, 9];
 
@@ -23,7 +26,8 @@ public class PuzzleManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        DetectDragging();
+        //DetectDragging();
+        DetectPop();
         DetectDeselect();
     }
 
@@ -38,6 +42,167 @@ public class PuzzleManager : MonoBehaviour
                 Nacho.isDragging = true;
             }
         }
+    }
+
+    void DetectPop(){
+
+        if(Nacho.shouldPop){
+
+            Nacho start = null, center = null, end = null;
+
+            int count = popStack.Count;
+
+            for (int i = 0; i < count; i++){
+
+                if (i == 0) end = popStack.Pop(); 
+                else if (i == count / 2) center = popStack.Pop();
+                else if (i == count - 1) start = popStack.Pop();
+                else popStack.Pop();
+            }
+
+            Debug.Log(end.col + ", " + center.col + ", " + start.col);
+
+            if ((start.row == end.row || start.row == center.row || center.row == end.row)
+                && (start.type == center.type && center.type == end.type)) 
+            {
+                Debug.Log("POP!!");
+
+
+                Nacho left = null, right = null, mid = null;
+
+                if (start.col < end.col && start.col < center.col)
+                {
+                    left = start;
+
+                    if(center.col < end.col){
+                        right = end;
+                        mid = center;
+                    }
+                    else {
+                        right = center;
+                        mid = end;
+                    }
+                }
+                else if (center.col < start.col && center.col < end.col)
+                {
+                    left = center;
+
+                    if (start.col < end.col)
+                    {
+                        right = end;
+                        mid = start;
+                    }
+                    else
+                    {
+                        right = start;
+                        mid = end;
+                    }
+
+                }
+                else
+                {
+                    left = end;
+
+                    if (start.col < center.col)
+                    {
+                        right = center;
+                        mid = start;
+                    }
+                    else
+                    {
+                        right = start;
+                        mid = center;
+                    }
+                }
+
+                int rightCol = right.col;
+                int leftCol = left.col;
+                int midRow = center.row;
+
+                if (start.isUp){
+
+                    for (int j = left.row; j >= midRow; j--)
+                    {
+                        for (int i = leftCol; i <= rightCol; i++)
+                        {
+                            Debug.Log("(" + j +", " +i + ")");
+                            Block[j, i].GetComponent<Nacho>().isPop = true;
+                        }
+                        leftCol++;
+                        rightCol--;
+                    }
+                } 
+                else
+                {
+                    for (int j = left.row; j <= center.row; j++)
+                    {
+                        for (int i = leftCol; i <= rightCol; i++)
+                        {
+                            Debug.Log("(" + j + ", " + i + ")");
+                            Block[j, i].GetComponent<Nacho>().isPop = true;
+                        }
+                        leftCol++;
+                        rightCol--;
+                    }
+
+                }
+
+                foreach (GameObject nacho in Block)
+                {
+                    if (nacho.GetComponent<Nacho>().isPop)
+                    {
+                        //POP EXECUTE
+                        
+                        nacho.GetComponent<Nacho>().transform.Rotate(0, 0, 30.0f);
+                        nacho.GetComponent<Nacho>().isPop = false;
+                        GameObject temp;
+                        int type;
+
+                        if(nacho.GetComponent<Nacho>().isUp){
+                            if(Random.Range(0, 2) % 2 == 0){
+                                temp = GNacho;
+                                type = 3;
+
+                            } else {
+                                temp = YNacho;
+                                type = 1;
+                            }
+
+                        } 
+                        else
+                        {
+                            if (Random.Range(0, 2) % 2 == 0)
+                            {
+                                temp = KNacho;
+                                type = 4;
+
+                            }
+                            else
+                            {
+                                temp = RNacho;
+                                type = 2;
+                            }
+
+                        }
+
+                        Block[nacho.GetComponent<Nacho>().row, nacho.GetComponent<Nacho>().col]
+                        = CreateNacho(temp,
+                                      type,
+                                      nacho.GetComponent<Nacho>().row,
+                                      nacho.GetComponent<Nacho>().col,
+                                      nacho.transform.position);
+
+                        Destroy(nacho);
+                        
+                    }
+                }
+            }
+            else
+                Debug.Log("fail..");
+
+        }
+
+        Nacho.shouldPop = false;
     }
 
     void DetectDeselect()
@@ -65,13 +230,14 @@ public class PuzzleManager : MonoBehaviour
 
         YNacho.transform.localScale = new Vector3(ratio / 50, ratio / 50, 0);
         RNacho.transform.localScale = new Vector3(ratio / 50, ratio / 50, 0);
+        GNacho.transform.localScale = new Vector3(ratio / 50, ratio / 50, 0);
+        KNacho.transform.localScale = new Vector3(ratio / 50, ratio / 50, 0);
         Field.transform.localScale = new Vector3(ratio / 6.5F, ratio / 6.5F, 0);
-
-        Field.AddComponent<FieldController>();
-
+        
         Instantiate(Field, new Vector3(0, 0, 1000), Quaternion.identity);
 
         GameObject nacho = null;
+        int type = 0;
         float x_space = 0, y_space = 0, x_start = 0, y_start = 0;
 
         for (int row = 0; row < 8; row++)
@@ -86,8 +252,8 @@ public class PuzzleManager : MonoBehaviour
                         x_space = 0.2028F;
                         y_space = 0.3431F;
 
-                        if (col == 2 || col == 4 || col == 6) { nacho = YNacho; }
-                        else { nacho = Empty; }
+                        if (col == 2 || col == 4 || col == 6) { nacho = YNacho; type = 1; }
+                        else { nacho = Empty; type = 0; }
                         break;
 
                     case 1:
@@ -101,6 +267,7 @@ public class PuzzleManager : MonoBehaviour
                             x_space = 0.2028F;
                             y_space = 0.3431F;
                             nacho = RNacho;
+                            type = 2;
                         }
                         else
                         {
@@ -109,6 +276,7 @@ public class PuzzleManager : MonoBehaviour
                             x_space = 0.2028F;
                             y_space = 0.3431F;
                             nacho = YNacho;
+                            type = 1;
                         }
                         break;
 
@@ -122,6 +290,7 @@ public class PuzzleManager : MonoBehaviour
                             x_space = 0.2028F;
                             y_space = 0.3431F;
                             nacho = YNacho;
+                            type = 1;
                         }
                         else
                         {
@@ -130,6 +299,7 @@ public class PuzzleManager : MonoBehaviour
                             x_space = 0.2028F;
                             y_space = 0.3431F;
                             nacho = RNacho;
+                            type = 2;
                         }
 
                         break;
@@ -140,8 +310,8 @@ public class PuzzleManager : MonoBehaviour
                         x_space = 0.2028F;
                         y_space = 0.3431F;
 
-                        if (col == 2 || col == 4 || col == 6) { nacho = RNacho; }
-                        else { nacho = Empty; }
+                        if (col == 2 || col == 4 || col == 6) { nacho = RNacho; type = 2; }
+                        else { nacho = Empty; type = 0; }
 
                         break;
 
@@ -150,7 +320,7 @@ public class PuzzleManager : MonoBehaviour
                 }
 
                 Block[row, col] = CreateNacho(
-                        nacho, row, col,
+                        nacho, type, row, col,
                         new Vector3(
                             ratio * x_start + (col * ratio * x_space),
                             ratio * y_start - (row * ratio * y_space), 1000));
@@ -159,7 +329,7 @@ public class PuzzleManager : MonoBehaviour
         }
     }
 
-    public GameObject CreateNacho(GameObject nacho, int row, int col, Vector3 pos) // idx는 컬럼의 인덱스 번호이고, pos는 실제 생성 위치
+    public GameObject CreateNacho(GameObject nacho, int type, int row, int col, Vector3 pos) // idx는 컬럼의 인덱스 번호이고, pos는 실제 생성 위치
     {
         GameObject temp = Instantiate(nacho) as GameObject;
         //temp.transform.SetParent(transform); // 생성된 캐릭터를 PuzzleManager의 자식으로 넣는다.
@@ -168,6 +338,11 @@ public class PuzzleManager : MonoBehaviour
         //temp.GetComponent<Nacho>().ClipName = string.Format("char{0:00}", 1);
         temp.transform.localPosition = pos;
         temp.name = nacho.ToString();
+
+        if(type % 2 == 1) temp.GetComponent<Nacho>().isUp = true;
+        else temp.GetComponent<Nacho>().isUp = false;
+
+        temp.GetComponent<Nacho>().type = type;
         temp.GetComponent<Nacho>().col = col;
         temp.GetComponent<Nacho>().row = row;
 

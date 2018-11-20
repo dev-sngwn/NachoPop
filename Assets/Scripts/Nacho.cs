@@ -8,15 +8,20 @@ public class Nacho : MonoBehaviour {
     Animator anim;
     public GameObject Effect;
 
+    public int type;
     public string ClipName, NewName; // 클립이름 PuzzleManager에서 자동으로 설정함 
     public int col; // PuzzleManager의 컬럼 번호 (ArrayList에서의 인덱스를 바로 찾아오기 위함)
     public int row; // PuzzleManager의 컬럼 번호 (ArrayList에서의 인덱스를 바로 찾아오기 위함)
-    public bool isDead = false;
     public bool isSelected = false;
-    public bool isStart = false;
     public bool isDiagonal = false;
+    public bool isUp = false;
+    public bool isPop = false;
     public static bool isDragging = false;
     public static bool shouldDeselect = false;
+    public static Nacho startNacho;
+    public static Nacho recentNacho;
+    public static Nacho beforeRecentNacho;
+    public static bool shouldPop = false;
 
     PuzzleManager manager;
 
@@ -40,16 +45,16 @@ public class Nacho : MonoBehaviour {
     public void SelectNacho(){
         if(!isSelected)
         {
-            //PuzzleManager.recentNacho = this;
+            manager.popStack.Push(this);
+            beforeRecentNacho = recentNacho;
+            recentNacho = this;
             isSelected = true;
             transform.Rotate(new Vector3(0, 0, 10.0f));
-            //Debug.Log(row + ", " + col);
         }
     }
 
     public void DeselectNacho(){
         if(isSelected){
-            isStart = false;
             isSelected = false;
             transform.Rotate(new Vector3(0, 0, -10.0f));
         }
@@ -59,32 +64,46 @@ public class Nacho : MonoBehaviour {
     {
         if(isDragging && IsDiagonal())
         {
-            PuzzleManager.recentNacho = this;
             SelectNacho();
+        }
+
+        if(isDragging && beforeRecentNacho == this){
+            Debug.Log("turn?");
+
+            manager.popStack.Push(this);
+            recentNacho = this;
         }
     }
 
-    private bool IsDiagonal(){
+    public bool IsDiagonal(){
 
-        PuzzleManager.recentNacho = this;
+        if ((recentNacho.isUp != this.isUp) &&
+            (recentNacho.col == this.col || recentNacho.row == this.row))
+            return true;
 
-        Debug.Log("(" + PuzzleManager.recentNacho.col + ", " + PuzzleManager.recentNacho.row + ")" + " " + this.col + ", " + this.row);
-        Debug.Log(PuzzleManager.recentNacho.col == this.col || PuzzleManager.recentNacho.row == this.row);
-
-        return PuzzleManager.recentNacho.col == this.col || PuzzleManager.recentNacho.row == this.row ? true : false;
+        return false;
     }
 
     private void OnMouseDown()
     {
-        PuzzleManager.recentNacho = this;
-        isStart = true;
+        startNacho = this;
+        isDragging = true;
+        recentNacho = this;
         SelectNacho();
     }
 
     private void OnMouseUp()
     {
-        Debug.Log("(" + PuzzleManager.recentNacho.row + ", " + PuzzleManager.recentNacho.col + ")" + " " + this.row + ", " + this.col);
-
+        isDragging = false;
         shouldDeselect = true;
+
+        if(manager.popStack.Count >= 3){
+            shouldPop = true;
+
+        } else {
+            manager.popStack.Clear();
+        }
     }
+
+
 }
