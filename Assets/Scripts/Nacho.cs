@@ -5,17 +5,19 @@ using UnityEngine;
 public class Nacho : MonoBehaviour {
     
     //USE YET
-    Animator anim;
-    public GameObject Effect;
+    //Animator anim;
+    //public GameObject Effect;
 
     public int type;
-    public string ClipName, NewName; // 클립이름 PuzzleManager에서 자동으로 설정함 
+    //public string ClipName, NewName; // 클립이름 PuzzleManager에서 자동으로 설정함 
     public int col; // PuzzleManager의 컬럼 번호 (ArrayList에서의 인덱스를 바로 찾아오기 위함)
     public int row; // PuzzleManager의 컬럼 번호 (ArrayList에서의 인덱스를 바로 찾아오기 위함)
+
     public bool isSelected = false;
     public bool isDiagonal = false;
     public bool isUp = false;
     public bool isPop = false;
+
     public static bool isDragging = false;
     public static bool shouldDeselect = false;
     public static Nacho startNacho;
@@ -28,7 +30,7 @@ public class Nacho : MonoBehaviour {
     // Use this for initialization
     void Start () {
         
-        anim = GetComponent<Animator>();
+        //anim = GetComponent<Animator>();
         //anim.Play(ClipName);
         // 하이어라키의 PuzzleManager를 가져온다.
         manager = GameObject.Find("PuzzleManager").GetComponent<PuzzleManager>();

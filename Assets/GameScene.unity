@@ -299,9 +299,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   YNacho: {fileID: 1587247544295206, guid: c640a1cac9b5f934284389f38d4c8e7a, type: 2}
   RNacho: {fileID: 1783315235756172, guid: 760ff883458fb17409ab072aba7b258b, type: 2}
+  GNacho: {fileID: 1616896538897792, guid: f648194c825fe459e8b95c1ab928aaff, type: 2}
+  KNacho: {fileID: 1179493829469000, guid: ae656ab8509ba4ac7bad50c2e27d7a39, type: 2}
   Empty: {fileID: 1088537022512114, guid: 766fd6616b6f6df4cb12ed78fb09408e, type: 2}
   Field: {fileID: 1835013634936610, guid: d708c3898580bfa44bd809372d9d13f2, type: 2}
-  temp: {fileID: 0}
+  canvas: {fileID: 0}
 --- !u!4 &1082976423
 Transform:
   m_ObjectHideFlags: 0
