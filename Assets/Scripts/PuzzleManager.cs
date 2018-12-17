@@ -1,10 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PuzzleManager : MonoBehaviour
 {
-
     public GameObject YNacho;
     public GameObject RNacho;
     public GameObject GNacho;
@@ -12,13 +12,32 @@ public class PuzzleManager : MonoBehaviour
     public GameObject Empty;
     public GameObject Field;
     public static Nacho recentNacho;
+    public int tempScore;
+    public int totalScore;
+    public Text scoreText;
     public Canvas canvas;
     public Stack<Nacho> popStack = new Stack<Nacho>();
+    public AudioClip scoreSound;
+    public AudioClip popSound;
+    public AudioSource scoreSoundSource;
+    public AudioSource popSoundSource;
 
     public GameObject[,] Block = new GameObject[8, 9];
 
+    private Touch touch;
+
     void Start()
     {
+
+        scoreSoundSource = this.gameObject.AddComponent<AudioSource>();
+        scoreSoundSource.clip = scoreSound;
+
+        popSoundSource = this.gameObject.AddComponent<AudioSource>();
+        popSoundSource.clip = popSound;
+
+        scoreText.text = totalScore.ToString();
+        totalScore = 0;
+        tempScore = 0;
         InitField();
     }
 
@@ -26,9 +45,77 @@ public class PuzzleManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+        if (Input.touchCount > 0)
+        {
+
+            touch = Input.GetTouch(0);
+
+            switch (touch.phase)
+            {
+                case TouchPhase.Began:
+                    Debug.Log("began");
+                    break;
+                case TouchPhase.Moved:
+                    Debug.Log("move");
+                    break;
+                case TouchPhase.Ended:
+                    Debug.Log("end");
+                    break;
+            }
+        }
         //DetectDragging();
         DetectPop();
         DetectDeselect();
+    }
+
+    IEnumerator ScoringEffect(int total, int temp)
+    {
+        float delay = 0.5f / temp * 20;
+        int amount = 0;
+
+        if (temp / 20 <= 4){
+            delay = 0.1f;
+            amount = 20;
+        } else if (temp / 20 <= 9){
+
+            delay = 0.065f;
+            amount = 30;
+        } else
+        {
+            delay = 0.065f;
+            amount = 40;
+
+        }
+
+        for (int i = 0; i <= temp; i += amount) 
+        {
+            if (i + amount > temp) { 
+                i = temp;
+                scoreText.text = (i + total).ToString(); 
+                break; 
+            }
+
+            scoreText.text = (i + total).ToString();
+            Debug.Log(i + total);
+            scoreSoundSource.Play();
+            yield return new WaitForSeconds(delay);
+        }
+    }
+
+    IEnumerator PopSound(int total, int score)
+    {
+        float delay = 0.5f / score * 20;
+
+        for (int i = 0; i <= score; i += 20)
+        {
+            scoreText.fontSize = 60;
+            yield return new WaitForSeconds(delay / 4 * 3);
+            scoreText.text = (i + total).ToString();
+            popSoundSource.Play();
+            scoreText.fontSize = 40;
+            yield return new WaitForSeconds(delay / 4 * 1);
+        }
     }
 
     void DetectDragging()
@@ -44,6 +131,13 @@ public class PuzzleManager : MonoBehaviour
         }
     }
 
+    private void CancelPop()
+    {
+        popStack.Clear();
+        Nacho.shouldPop = false;
+        Nacho.isTurn = false;
+    }
+
     void DetectPop(){
 
         if(Nacho.shouldPop){
@@ -51,6 +145,12 @@ public class PuzzleManager : MonoBehaviour
             Nacho start = null, center = null, end = null;
 
             int count = popStack.Count;
+
+            Debug.Log(count);
+            if(!(count == 5 || count == 9 || count == 13 || count == 17)){
+                CancelPop();
+                return;
+            }
 
             for (int i = 0; i < count; i++){
 
@@ -65,6 +165,13 @@ public class PuzzleManager : MonoBehaviour
             if ((start.row == end.row || start.row == center.row || center.row == end.row)
                 && (start.type == center.type && center.type == end.type)) 
             {
+                if((end.row == start.row && start.row == center.row) || !Nacho.isTurn)
+                {
+                    Debug.Log(Nacho.isTurn);
+                    CancelPop();
+                    return;
+                }
+
                 Debug.Log("POP!!");
 
 
@@ -152,7 +259,7 @@ public class PuzzleManager : MonoBehaviour
                     if (nacho.GetComponent<Nacho>().isPop)
                     {
                         //POP EXECUTE
-                        
+                        tempScore += 20;
                         nacho.GetComponent<Nacho>().transform.Rotate(0, 0, 30.0f);
                         nacho.GetComponent<Nacho>().isPop = false;
                         GameObject temp;
@@ -196,13 +303,19 @@ public class PuzzleManager : MonoBehaviour
                         
                     }
                 }
+                int totalTmp = totalScore;
+                StartCoroutine(ScoringEffect(totalTmp, tempScore));
+                totalScore += tempScore;
+                StartCoroutine(PopSound(totalTmp, tempScore));
+                tempScore = 0;
             }
             else
                 Debug.Log("fail..");
 
+            Nacho.shouldPop = false;
+            Nacho.isTurn = false;
         }
 
-        Nacho.shouldPop = false;
     }
 
     void DetectDeselect()

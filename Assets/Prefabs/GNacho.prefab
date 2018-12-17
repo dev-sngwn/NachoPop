@@ -23,6 +23,7 @@ GameObject:
   - component: {fileID: 114668569194697656}
   - component: {fileID: 60726927931917306}
   - component: {fileID: 114005193888761858}
+  - component: {fileID: 58728864925971434}
   m_Layer: 0
   m_Name: GNacho
   m_TagString: Nacho
@@ -30,6 +31,21 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!58 &58728864925971434
+CircleCollider2D:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1616896538897792}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: -1}
+  serializedVersion: 2
+  m_Radius: 6.665
 --- !u!60 &60726927931917306
 PolygonCollider2D:
   m_ObjectHideFlags: 1
@@ -274,10 +290,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 254fe92bf05dfdf4898ed9fcde4e9c10, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Effect: {fileID: 0}
   type: 0
-  ClipName: 
-  NewName: 
   col: 0
   row: 0
   isSelected: 0
@@ -338,7 +351,7 @@ RectTransform:
   m_GameObject: {fileID: 1616896538897792}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.05, y: 0.05, z: 0}
+  m_LocalScale: {x: 0.039919354, y: 0.039919354, z: 0}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0

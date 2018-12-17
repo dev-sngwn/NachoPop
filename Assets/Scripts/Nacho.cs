@@ -20,6 +20,7 @@ public class Nacho : MonoBehaviour {
 
     public static bool isDragging = false;
     public static bool shouldDeselect = false;
+    public static bool isTurn;
     public static Nacho startNacho;
     public static Nacho recentNacho;
     public static Nacho beforeRecentNacho;
@@ -38,11 +39,8 @@ public class Nacho : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (Input.GetMouseButton(0))
-        {
 
-        }
-	}
+    }
 
     public void SelectNacho(){
         if(!isSelected)
@@ -64,14 +62,14 @@ public class Nacho : MonoBehaviour {
 
     private void OnMouseEnter()
     {
-        if(isDragging && IsDiagonal())
+        if (isDragging && IsDiagonal())
         {
             SelectNacho();
         }
 
         if(isDragging && beforeRecentNacho == this){
             Debug.Log("turn?");
-
+            isTurn = !isTurn;
             manager.popStack.Push(this);
             recentNacho = this;
         }
@@ -80,7 +78,9 @@ public class Nacho : MonoBehaviour {
     public bool IsDiagonal(){
 
         if ((recentNacho.isUp != this.isUp) &&
-            (recentNacho.col == this.col || recentNacho.row == this.row))
+            (recentNacho.col == this.col || recentNacho.row == this.row) &&
+            (Mathf.Abs(recentNacho.col - this.col) <= 1) && (Mathf.Abs(recentNacho.row - this.row) <= 1)
+           )
             return true;
 
         return false;
@@ -88,6 +88,7 @@ public class Nacho : MonoBehaviour {
 
     private void OnMouseDown()
     {
+        Debug.Log("began2");
         startNacho = this;
         isDragging = true;
         recentNacho = this;
@@ -96,6 +97,7 @@ public class Nacho : MonoBehaviour {
 
     private void OnMouseUp()
     {
+        Debug.Log("end2");
         isDragging = false;
         shouldDeselect = true;
 
@@ -104,6 +106,7 @@ public class Nacho : MonoBehaviour {
 
         } else {
             manager.popStack.Clear();
+            isTurn = false;
         }
     }
 
