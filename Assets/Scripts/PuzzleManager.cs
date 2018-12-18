@@ -15,6 +15,7 @@ public class PuzzleManager : MonoBehaviour
     public int tempScore;
     public int totalScore;
     public Text scoreText;
+    public Text scoreBackground;
     public Canvas canvas;
     public Stack<Nacho> popStack = new Stack<Nacho>();
     public AudioClip scoreSound;
@@ -36,6 +37,7 @@ public class PuzzleManager : MonoBehaviour
         popSoundSource.clip = popSound;
 
         scoreText.text = totalScore.ToString();
+        scoreBackground.text = totalScore.ToString();
         totalScore = 0;
         tempScore = 0;
         InitField();
@@ -65,6 +67,7 @@ public class PuzzleManager : MonoBehaviour
             }
         }
         //DetectDragging();
+
         DetectPop();
         DetectDeselect();
     }
@@ -92,11 +95,13 @@ public class PuzzleManager : MonoBehaviour
         {
             if (i + amount > temp) { 
                 i = temp;
-                scoreText.text = (i + total).ToString(); 
+                scoreText.text = (i + total).ToString();
+                scoreBackground.text = (i + total).ToString();
                 break; 
             }
 
             scoreText.text = (i + total).ToString();
+            scoreBackground.text = (i + total).ToString();
             Debug.Log(i + total);
             scoreSoundSource.Play();
             yield return new WaitForSeconds(delay);
@@ -110,17 +115,19 @@ public class PuzzleManager : MonoBehaviour
         for (int i = 0; i <= score; i += 20)
         {
             scoreText.fontSize = 60;
+            scoreBackground.fontSize = 60;
             yield return new WaitForSeconds(delay / 4 * 3);
             scoreText.text = (i + total).ToString();
+            scoreBackground.text = (i + total).ToString();
             popSoundSource.Play();
             scoreText.fontSize = 40;
+            scoreBackground.fontSize = 40;
             yield return new WaitForSeconds(delay / 4 * 1);
         }
     }
 
     void DetectDragging()
     {
-
         foreach (GameObject nacho in Block)
         {
             if (nacho.GetComponent<Nacho>().isSelected)
@@ -318,7 +325,7 @@ public class PuzzleManager : MonoBehaviour
 
     }
 
-    void DetectDeselect()
+    public void DetectDeselect()
     {
 
         foreach (GameObject nacho in Block)

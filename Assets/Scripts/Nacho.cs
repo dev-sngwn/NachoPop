@@ -43,7 +43,7 @@ public class Nacho : MonoBehaviour {
     }
 
     public void SelectNacho(){
-        if(!isSelected)
+        if(!isSelected && GameDirector.touch)
         {
             manager.popStack.Push(this);
             beforeRecentNacho = recentNacho;

@@ -1,8 +1,8 @@
 fileFormatVersion: 2
-guid: d5d915bdb4a948a40b41a43d6d6263fd
+guid: d72821ae7e6d71244b7fd52a03c0769e
 TextureImporter:
   fileIDToRecycleName:
-    21300000: Field_sliced
+    21300000: Field_0
   externalObjects: {}
   serializedVersion: 7
   mipmaps:
@@ -107,21 +107,21 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Field_sliced
+      name: Field_0
       rect:
         serializedVersion: 2
-        x: 55
-        y: 123
-        width: 1327
-        height: 1803
+        x: 45
+        y: 111
+        width: 1347
+        height: 1826
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 69063a48a0d6262419f994fdc3dfa4a3
+      spriteID: e45403a00f28de4449af2281eaa8a8a3
       vertices: []
       indices: 
       edges: []
@@ -129,7 +129,7 @@ TextureImporter:
     outline: []
     physicsShape: []
     bones: []
-    spriteID: c09fbb80ab366614bb4d372cefa3f413
+    spriteID: afe199df707b5c14e931abf769022409
     vertices: []
     indices: 
     edges: []
